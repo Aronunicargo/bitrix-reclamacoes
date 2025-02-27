@@ -18,6 +18,9 @@ const fetchReclamacoes = async () => {
         r.obs,
         r.plano_acao,
         r.causa_raiz,
+        r.acao_imediata,
+        rr.id_remessa,
+        u.email  AS  atendente_email,
         sr.descricao AS status,
         CONCAT(r.data_incluido, ' ', r.hora_incluido) AS data_hora_incluido,
         GROUP_CONCAT(DISTINCT rh.data ORDER BY rh.data SEPARATOR ' --') AS data_historico,
@@ -35,6 +38,7 @@ const fetchReclamacoes = async () => {
         GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
         ORDER BY r.data_incluido DESC
         LIMIT 10;
+
   `);
   await connection.end();
   return rows;

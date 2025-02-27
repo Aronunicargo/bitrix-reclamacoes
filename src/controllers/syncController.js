@@ -8,7 +8,6 @@ const syncReclamacoes = async () => {
     const reclamacoes = await fetchReclamacoes();
 
     for (const row of reclamacoes) {
-      console.log("Aquii", row);
 
       const bitrixStatus = getBitrixStatus(row.status);
       await createOrUpdateDeal(row, bitrixStatus);
