@@ -2,8 +2,6 @@ const axios = require("axios");
 const { BITRIX_URL } = require("../config/bitrix");
 const formatObservations = require("../utils/formatObs");
 
-;
-
 const getExistingDeal = async (title) => {
   try {
     const response = await axios.get(`${BITRIX_URL}/crm.deal.list`, {
@@ -120,7 +118,7 @@ const createOrUpdateDeal = async (row, bitrixStatus) => {
     UF_CRM_1740690771499: row.cliente,
     STATUS_ID: bitrixStatus,
     STAGE_ID: bitrixStatus,
-    CATEGORY_ID: "1",
+    CATEGORY_ID: "10",
   };
 
   try {

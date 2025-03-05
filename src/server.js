@@ -7,7 +7,7 @@ const { syncReclamacoes } = require("./controllers/syncController");
 const app = express();
 
 syncReclamacoes()
-  .then(() => console.log("syncReclamacoes executado na inicialização"))
+  .then(() => console.log("Primeira chamada para atualizar as reclamações"))
   .catch((err) => console.error("Erro ao executar syncReclamacoes:", err));
 
 app.listen(3000, () => {

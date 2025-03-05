@@ -14,7 +14,7 @@ const fetchReclamacoes = async () => {
         r.reclamante,
         u.primeiro_nome AS atendente,
         u2.nome_completo AS responsavel_plano,
-        DATE_FORMAT(CONVERT_TZ(r.data_prazo, '+00:00', '-03:00'), '%Y-%m-%dT%H:%i:%s') AS data_prazo,
+        r.data_prazo,
         r.obs,
         r.plano_acao,
         r.causa_raiz,
