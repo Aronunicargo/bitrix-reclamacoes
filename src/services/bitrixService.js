@@ -2,7 +2,6 @@ const axios = require("axios");
 const { BITRIX_URL } = require("../config/bitrix");
 const formatObservations = require("../utils/formatObs");
 
-
 const getExistingDeal = async (title) => {
   try {
     const response = await axios.get(`${BITRIX_URL}/crm.deal.list`, {
@@ -52,6 +51,9 @@ const getOrCreateContactId = async (email, name, fieldsToUpdate = {}) => {
 };
 
 const getOrCreateCompanyId = async (companyName) => {
+  if (!companyName) {
+    return null;
+  }
   try {
     const response = await axios.get(`${BITRIX_URL}/crm.company.list`, {
       params: { FILTER: { TITLE: companyName }, SELECT: ["ID"] },
@@ -102,13 +104,13 @@ const createOrUpdateDeal = async (row, bitrixStatus) => {
         })
       : null;
 
-  const companyId = await getOrCreateCompanyId(row.empresa);
+  const company = await getOrCreateCompanyId(row.cliente);
   const formattedObs = formatObservations(row.obs);
 
   const dealFields = {
     TITLE: title,
     BEGINDATE: row.data_hora_incluido,
-    COMPANY_ID: companyId,
+    COMPANY_ID: company,
     COMMENTS: `Observação: ${formattedObs}`,
     UF_CRM_1740592978672: row.data_prazo,
     UF_CRM_1740593059509: row.responsavel_plano,
