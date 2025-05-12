@@ -2,6 +2,7 @@ const axios = require("axios");
 const { BITRIX_URL } = require("../config/bitrix");
 const formatObservations = require("../utils/formatObs");
 
+
 const getExistingDeal = async (title) => {
   try {
     const response = await axios.get(`${BITRIX_URL}/crm.deal.list`, {
@@ -19,6 +20,10 @@ const getExistingDeal = async (title) => {
 
 const getOrCreateContactId = async (email, name, fieldsToUpdate = {}) => {
   try {
+    if (!email) {
+      return null;
+    }
+
     const response = await axios.get(`${BITRIX_URL}/crm.contact.list`, {
       params: { FILTER: { EMAIL: email }, SELECT: ["ID"] },
     });
@@ -88,23 +93,21 @@ const updateContact = async (contactId, fields) => {
 const createOrUpdateDeal = async (row, bitrixStatus) => {
   const title = `${row.tipo_reclamacao} - ID ${row.id_reclamacao}`;
   const existingDeal = await getExistingDeal(title);
-  const contactId = await getOrCreateContactId(row.email, row.reclamante, {
-    PHONE: [{ VALUE: row.telefone, VALUE_TYPE: "WORK" }],
-  });
+
+  const email = row.email?.trim();
+  const contactId =
+    email !== ""
+      ? await getOrCreateContactId(email, row.reclamante, {
+          PHONE: [{ VALUE: row.telefone, VALUE_TYPE: "WORK" }],
+        })
+      : null;
+
   const companyId = await getOrCreateCompanyId(row.empresa);
-
-  if (!contactId) {
-    return {
-      success: false,
-      message: `Erro ao associar contato: ${row.cliente}`,
-    };
-  }
-
   const formattedObs = formatObservations(row.obs);
+
   const dealFields = {
     TITLE: title,
     BEGINDATE: row.data_hora_incluido,
-    CONTACT_ID: contactId,
     COMPANY_ID: companyId,
     COMMENTS: `Observação: ${formattedObs}`,
     UF_CRM_1740592978672: row.data_prazo,
@@ -120,6 +123,10 @@ const createOrUpdateDeal = async (row, bitrixStatus) => {
     STAGE_ID: bitrixStatus,
     CATEGORY_ID: "10",
   };
+
+  if (contactId) {
+    dealFields.CONTACT_ID = contactId;
+  }
 
   try {
     if (existingDeal) {
